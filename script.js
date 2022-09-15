@@ -1,7 +1,13 @@
 
+let dates = {
+    "now": new Date()
+}
+let dom = {}
+let valueFields = []
 
 // ***** DATES *****
 const now = new Date()
+
 
 const startDateInp = document.querySelector("#start-date-inp")
 const endDateInp = document.querySelector("#end-date-inp")
