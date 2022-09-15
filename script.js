@@ -1,3 +1,6 @@
+
+
+// ***** DATES *****
 const now = new Date()
 
 const startDateInp = document.querySelector("#start-date-inp")
@@ -11,10 +14,12 @@ const amtPerYear = document.querySelector("#amt-per-year")
 
 const submitBtn = document.querySelector("#submit-btn")
 submitBtn.addEventListener("click", function(){
+
     const startDate = startDateInp.value
     const endDate = endDateInp.value
     const amt = numberInp.value
     if(!startDate || !endDate || !amt) return
+    if(amt<=0) return
 
     const startDateArr = startDate.split("-")
     const endDateArr = endDate.split("-")
@@ -36,15 +41,43 @@ submitBtn.addEventListener("click", function(){
     if (perYear > amt) perYear = amt
     else perYear = perYear.toFixed(2)
 
-    amtPerDay.textContent = `Amount per Day: ${perDay.toFixed(2)}`
-    amtPerWeek.textContent = `Amount per Week: ${perWeek}`
-    amtPerMonth.textContent = `Amount per Month: ${perMonth}`
-    amtPerYear.textContent = `Amount per Year: ${perYear}`
+    amtPerDay.textContent = `Per Day: ${perDay.toFixed(2)}`
+    amtPerWeek.textContent = `Per Week: ${perWeek}`
+    amtPerMonth.textContent = `Per Month: ${perMonth}`
+    amtPerYear.textContent = `Per Year: ${perYear}`
 })
+
+function calculateDiff(){
+    const startDate = startDateInp.valueAsDate
+    const endDate = endDateInp.valueAsDate
+    const dateDiff = endDate - startDate
+    return dateDiff
+}
 
 
 const todayBtn = document.querySelector("#today-btn")
 todayBtn.addEventListener("click", function(){
     console.log(now)
     startDateInp.valueAsDate = now
+})
+
+const newValue = document.querySelector("#newValue")
+newValue.addEventListener("click", ()=>{
+
+})
+
+const submitValue = document.getElementById("value-input-container")
+submitValue.addEventListener("click", (event)=>{
+    if(!event.target.nodeName === "BUTTON"){
+        return
+    }
+
+    let buttonId = event.target.id
+    
+    if(buttonId.startsWith("valSubmitBtn")){
+        buttonId = buttonId.replace("valSubmitBtn", "")
+    }
+    else if(buttonId.startsWith("valDeleteBtn")){
+
+    }
 })

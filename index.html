@@ -16,16 +16,20 @@
         <div class="inputs">
             <input type="date" id="start-date-inp" class="date-input">
             <input type="date" id="end-date-inp" class="date-input">
-            <input type="number" id="number-inp" placeholder="Amount">
+            <div class="value-input-container">
+                
+            </div>
+            <button id="newValue">New Value</button>
         </div>
         <button id="today-btn">Today</button>
         <button id="submit-btn">Submit</button>
-        <div class="work-container">
-            <p class="amt" id="amt-per-year">Amount per Year: </p>
-            <p class="amt" id="amt-per-month">Amount per Month: </p>
-            <p class="amt" id="amt-per-week">Amount per Week: </p>
-            <p class="amt" id="amt-per-day">Amount per Day: </p>
-        </div>
+        <fieldset class="work-container">
+            <legend>Amount</legend>
+            <p class="amt" id="amt-per-year">Per Year: </p>
+            <p class="amt" id="amt-per-month">Per Month: </p>
+            <p class="amt" id="amt-per-week">Per Week: </p>
+            <p class="amt" id="amt-per-day">Per Day: </p>
+        </fieldset>
     </div>
     <script src="script.js"></script>
 </body>
