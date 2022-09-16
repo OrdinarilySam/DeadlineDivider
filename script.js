@@ -21,24 +21,44 @@ let valueFields = []
 dom.todayBtn.addEventListener("click", setStartAsToday)
 dom.newValue.addEventListener("click", createNewValue)
 
+// This event listener checks for the submit button, the delete button, and a click on the paragraph
 dom.valueContainer.addEventListener("click", (event)=>{
-    if(!event.target.nodeName === "BUTTON") return;
+    if((!event.target.nodeName === "BUTTON") || (!event.target.nodeName === "P"));
     let buttonId = event.target.id
     
     if(buttonId.startsWith("valSubmitBtn")){
         buttonId = parseInt(buttonId.replace("valSubmitBtn", ""))
         // Create a new value field
         // Render the new values
+        console.log("submit button clicked with id", buttonId)
+        try {
+            inputValue = parseInt(document.getElementById(`valueInput${buttonId}`).value)
+            if(inputValue <= 0) throw "Input is not a valid number"
+        } catch (error) {
+            document.getElementById(`valueInput${buttonId}`).style.border = "1px solid red"
+            return
+        }
         valueFields[buttonId].value = document.getElementById(`valueInput${buttonId}`).value
+        valueFields[buttonId].hasAnswered = true
     }
     else if(buttonId.startsWith("valDeleteBtn")){
         // Remove a value field
-        // Render the new values
+        // Render the new values with updated ids
 
     }
+    else if(buttonId.startsWith("valP")){
+        // Change the text field to an input field.
+    }
+})
+dom.valueContainer.addEventListener("change", (event)=>{
+    if(!event.target.nodeName === "INPUT") return;
+    let buttonId = event.target.id
+
+    console.log("something changed at", buttonId)
 })
 
 
+// Small buttons and functions
 function captureDates(){
     if(!dom.startDateInput.value || !dom.endDateInput.value) return false;
     dates.startDate = dom.startDateInput.valueAsDate
@@ -51,31 +71,25 @@ function setStartAsToday(){
     dom.startDateInput.value = dateFormat(dates.startDate)
 }
 
-function renderFields(){
-    // Using the function of value Fields, render them given a new field is added, changed, or removed
-    // Will not render when the sumbit button is clicked
-    valueFieldContainerHTML = ""
-    for(let i = 0; i < valueFields.length; i++){
-        if(!valueFields[i].hasAnswered){
-            valueFieldContainerHTML += `
-            <div class="value-field" id="valueField${i}">
-                <input type="number" min="0" placeholder="number" id="valueInput${i}" class="value-input">
-                <button id="valSubmitBtn${i}" class="val-submit-btn">+</button>
-            </div>
-            `
-        }
-    }
-    dom.valueContainer.innerHTML = valueFieldContainerHTML
-
-}
-
 function createNewValue(){
     newValue = {
         hasAnswered: false,
         value: null
     }
+    tempEl = document.createElement("div")
+    tempEl.id = `valueField${valueFields.length}`
+    tempEl.class = `value-field`
+    tempEl.innerHTML = `
+        <div class="value-field" id="valueField${valueFields.length}">
+            <form action="submit" onsubmit="return false">
+                <input type="number" min="0" placeholder="number" id="valueInput${valueFields.length}" class="value-input">
+                <button id="valSubmitBtn${valueFields.length}" class="val-submit-btn" type="submit">+</button>
+            </form>
+        </div>
+        `
     valueFields.push(newValue)
-    renderFields()
+    dom.valueContainer.appendChild(tempEl)
+    // renderFields()
 }
 
 function calculateDiff(){
