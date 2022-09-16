@@ -23,7 +23,7 @@ body{
 }
 
 h1{
-    font-size: 40px;
+    font-size: 3rem;
     font-family: 'Alfa Slab One', sans-serif;
     font-variant: small-caps;
     margin: 10px;
@@ -69,4 +69,13 @@ input[type="date"]{
     padding: 0.25em;
     border: none;
     border-radius: 0.5em;
+}
+
+.value-field{
+    margin: 0.5em 0;
+}
+.value-input{
+    padding: 0.25em;
+    border-radius: 0.5em;
+    border: none;
 }
