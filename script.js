@@ -21,40 +21,77 @@ let valueFields = []
 dom.todayBtn.addEventListener("click", setStartAsToday)
 dom.newValue.addEventListener("click", createNewValue)
 
+function saveValueInput(buttonId){
+    try {
+        buttonId = parseInt(buttonId.replace("valSubmitBtn", ""))
+    } catch (error) {
+        
+    }
+    // Create a new value field
+    // Render the new values
+    try {
+        inputValue = parseInt(document.getElementById(`valueInput${buttonId}`).value)
+        if(inputValue <= 0) throw "Input is not a valid number"
+        if(!inputValue) throw "No input"
+    } catch (error) {
+        document.getElementById(`valueInput${buttonId}`).style.border = "1px solid red"
+        return
+    }
+    valueFields[buttonId].value = document.getElementById(`valueInput${buttonId}`).value
+    valueFields[buttonId].hasAnswered = true
+
+    placeholder = `
+        <form onsubmit="return false">
+            <p id="valP${buttonId}" class="val-p">${valueFields[buttonId].value}</p>
+            <button id="valDeleteBtn${buttonId}" class="val-btn val-delete-btn">-</button>
+        </form>
+    `
+    document.getElementById(`valueField${buttonId}`)
+        .innerHTML = placeholder
+}
+
 // This event listener checks for the submit button, the delete button, and a click on the paragraph
 dom.valueContainer.addEventListener("click", (event)=>{
     if((!event.target.nodeName === "BUTTON") || (!event.target.nodeName === "P"));
     let buttonId = event.target.id
     
     if(buttonId.startsWith("valSubmitBtn")){
-        buttonId = parseInt(buttonId.replace("valSubmitBtn", ""))
-        // Create a new value field
-        // Render the new values
-        console.log("submit button clicked with id", buttonId)
-        try {
-            inputValue = parseInt(document.getElementById(`valueInput${buttonId}`).value)
-            if(inputValue <= 0) throw "Input is not a valid number"
-        } catch (error) {
-            document.getElementById(`valueInput${buttonId}`).style.border = "1px solid red"
-            return
-        }
-        valueFields[buttonId].value = document.getElementById(`valueInput${buttonId}`).value
-        valueFields[buttonId].hasAnswered = true
+        saveValueInput(buttonId)
     }
     else if(buttonId.startsWith("valDeleteBtn")){
         // Remove a value field
         // Render the new values with updated ids
+        console.log("button tried to delete with an id", buttonId)
+        buttonId = parseInt(buttonId.replace("valDeleteBtn", ""))
+        console.log(valueFields)
+        valueFields.pop(buttonId)
+        console.log(valueFields)
 
     }
     else if(buttonId.startsWith("valP")){
         // Change the text field to an input field.
+        buttonId = parseInt(buttonId.replace("valP", ""))
+        placeholder = `
+        <form action="submit" onsubmit="return false">
+            <input type="number" min="0" placeholder="${valueFields[buttonId].value}" value="${valueFields[buttonId].value}" id="valueInput${buttonId}" class="value-input">
+            <button id="valSubmitBtn${buttonId}" class="val-btn val-submit-btn" type="submit">+</button>
+        </form>
+        `
+        document.getElementById(`valueField${buttonId}`)
+            .innerHTML = placeholder
+
+        const valInp = document.getElementById(`valueInput${buttonId}`)
+        valInp.focus()
+
+        const tempval = valInp.value
+        valInp.value = ""
+        valInp.value = tempval
     }
 })
-dom.valueContainer.addEventListener("change", (event)=>{
+dom.valueContainer.addEventListener("focusout", (event)=>{
     if(!event.target.nodeName === "INPUT") return;
-    let buttonId = event.target.id
-
-    console.log("something changed at", buttonId)
+    buttonId = parseInt(event.target.id.replace("valueInput", ""))
+    saveValueInput(buttonId)
 })
 
 
@@ -78,14 +115,12 @@ function createNewValue(){
     }
     tempEl = document.createElement("div")
     tempEl.id = `valueField${valueFields.length}`
-    tempEl.class = `value-field`
+    tempEl.classList.add(`value-field`)
     tempEl.innerHTML = `
-        <div class="value-field" id="valueField${valueFields.length}">
-            <form action="submit" onsubmit="return false">
-                <input type="number" min="0" placeholder="number" id="valueInput${valueFields.length}" class="value-input">
-                <button id="valSubmitBtn${valueFields.length}" class="val-submit-btn" type="submit">+</button>
-            </form>
-        </div>
+        <form action="submit" onsubmit="return false">
+            <input type="number" min="0" placeholder="num" id="valueInput${valueFields.length}" class="value-input">
+            <button id="valSubmitBtn${valueFields.length}" class="val-btn val-submit-btn" type="submit">+</button>
+        </form>
         `
     valueFields.push(newValue)
     dom.valueContainer.appendChild(tempEl)
