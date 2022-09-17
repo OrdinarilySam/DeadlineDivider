@@ -49,6 +49,31 @@ function saveValueInput(buttonId){
     document.getElementById(`valueField${buttonId}`)
         .innerHTML = placeholder
 }
+function renderAll(){
+    fullString = ""
+    for(let i = 0; i < valueFields.length; i++){
+        if(valueFields[i].hasAnswered){
+            fullString += `
+                <div class="value-field" id="valueField${i}">
+                    <form onsubmit="return false">
+                        <p id="valP${i}" class="val-p">${valueFields[i].value}</p>
+                        <button id="valDeleteBtn${i}" class="val-btn val-delete-btn">-</button>
+                    </form>
+                </div>
+            `
+        }else{
+            fullString += `
+                <div class="value-field" id="valueField${i}">
+                    <form action="submit" onsubmit="return false">
+                        <input type="number" min="0" placeholder="num" id="valueInput${i}" class="value-input">
+                        <button id="valSubmitBtn${i}" class="val-btn val-submit-btn" type="submit">+</button>
+                    </form>
+                </div>
+            `
+        }
+    }
+    dom.valueContainer.innerHTML = fullString
+}
 
 // This event listener checks for the submit button, the delete button, and a click on the paragraph
 dom.valueContainer.addEventListener("click", (event)=>{
@@ -63,9 +88,8 @@ dom.valueContainer.addEventListener("click", (event)=>{
         // Render the new values with updated ids
         console.log("button tried to delete with an id", buttonId)
         buttonId = parseInt(buttonId.replace("valDeleteBtn", ""))
-        console.log(valueFields)
-        valueFields.pop(buttonId)
-        console.log(valueFields)
+        valueFields.splice(buttonId, 1)
+        renderAll()
 
     }
     else if(buttonId.startsWith("valP")){
@@ -89,7 +113,7 @@ dom.valueContainer.addEventListener("click", (event)=>{
     }
 })
 dom.valueContainer.addEventListener("focusout", (event)=>{
-    if(!event.target.nodeName === "INPUT") return;
+    if(!event.target.nodeName === "INPUT") console.log("not an input");
     buttonId = parseInt(event.target.id.replace("valueInput", ""))
     saveValueInput(buttonId)
 })
