@@ -156,14 +156,29 @@ function calculateDiff(){
 }
 
 
-dom.submitBtn.addEventListener("click", (event)=>{
+dom.submitBtn.addEventListener("click", ()=>{
     total = 0
     for(let i = 0; i<valueFields.length; i++){
         if(!valueFields[i].hasAnswered) return;
         total += parseInt(valueFields[i].value)
     }
     dom.totalCount.innerText = `Total: ${total}`
+    renderFinal(total)
 })
+
+function renderFinal(total){
+    finalHtml = ""
+    for(let i = 0; i<valueFields.length; i++){
+        weight = parseInt(valueFields[i].value) / total
+        finalHtml += `
+            <div class="final-field" id="finalField${i}">
+                <p id="finalP${i}" class="final-p">${valueFields[i].value}</p>
+                <p class="final-weight">${weight}</p>
+            </div>
+        `
+    }
+    dom.valueContainer.innerHTML = finalHtml
+}
 
 function dateFormat(inputDate) {
     const date = new Date(inputDate)
