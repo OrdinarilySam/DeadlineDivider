@@ -14,7 +14,8 @@ let dom = {
     "submitBtn": document.getElementById("submitBtn"),
     "todayBtn": document.getElementById("todayBtn"),
     "newValue": document.getElementById("newValueBtn"),
-    "valueContainer": document.getElementById("valueContainer")
+    "valueContainer": document.getElementById("valueContainer"),
+    "totalCount": document.getElementById("totalCount")
 }
 let valueFields = []
 
@@ -27,8 +28,6 @@ function saveValueInput(buttonId){
     } catch (error) {
         
     }
-    // Create a new value field
-    // Render the new values
     try {
         inputValue = parseInt(document.getElementById(`valueInput${buttonId}`).value)
         if(inputValue <= 0) throw "Input is not a valid number"
@@ -158,7 +157,12 @@ function calculateDiff(){
 
 
 dom.submitBtn.addEventListener("click", (event)=>{
-    
+    total = 0
+    for(let i = 0; i<valueFields.length; i++){
+        if(!valueFields[i].hasAnswered) return;
+        total += parseInt(valueFields[i].value)
+    }
+    dom.totalCount.innerText = `Total: ${total}`
 })
 
 function dateFormat(inputDate) {
