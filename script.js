@@ -1,83 +1,219 @@
+// GLOBAL VARIABLES
+let dates = {
+    "now": new Date(),
+    "startDate": null,
+    "endDate": null
+}
+let dom = {
+    "startDateInput": document.getElementById("startDateInput"),
+    "endDateInput": document.getElementById("endDateInput"),
+    "submitBtn": document.getElementById("submitBtn"),
+    "todayBtn": document.getElementById("todayBtn"),
+    "newValue": document.getElementById("newValueBtn"),
+    "valueContainer": document.getElementById("valueContainer"),
+    "total": document.getElementById("total"),
+    "amtPerDay": document.getElementById("amtPerDay")
+}
+let valueFields = []
 
+// FUNCTIONS
+function getHtml(id, div=false, replace=false, final=false){
+    let placeholder = ""
 
-// ***** DATES *****
-const now = new Date()
+    if(final){
+        placeholder = `
+            <div class="final-field">
+                <p class="final-p">${valueFields[id].value}</p>
+                <p class="amount-of-days" id="timeForCompletion${id}"></p>
+            </div>`
+    }
+    else if(!valueFields[id].hasAnswered || replace){
+        placeholder = `
+            <form action="submit" onsubmit="return false">
+                <input type="number" min="0" 
+                    ${replace ? `placeholder="${valueFields[id].value}" value="${valueFields[id].value}"` : `placeholder="num"`} 
+                    id="valueInput${id}" class="value-input">
+                <button id="valSubmitBtn${id}" class="val-btn val-submit-btn" type="submit">+</button>
+            </form>`
+    }else{
+        placeholder = `
+            <form onsubmit="return false">
+                <p id="valP${id}" class="val-p">${valueFields[id].value}</p>
+                <button id="valDeleteBtn${id}" class="val-btn val-delete-btn">-</button>
+            </form>`
+    }
 
-const startDateInp = document.querySelector("#start-date-inp")
-const endDateInp = document.querySelector("#end-date-inp")
-const numberInp = document.querySelector("#number-inp")
+    if(div){
+        placeholder = `
+            <div class="value-field" id="valueField${id}">
+                ${placeholder}
+            </div>`
+    }
+    return placeholder
+}
 
-const amtPerDay = document.querySelector("#amt-per-day")
-const amtPerWeek = document.querySelector("#amt-per-week")
-const amtPerMonth = document.querySelector("#amt-per-month")
-const amtPerYear = document.querySelector("#amt-per-year")
+function saveValueInput(id){
+    try {
+        inputValue = parseInt(document.getElementById(`valueInput${id}`).value)
+        if(inputValue <= 0) throw "Input is not a valid number"
+        if(!inputValue) throw "No input"
+    } catch (error) {
+        document.getElementById(`valueInput${id}`).style.border = "1px solid red"
+        return
+    }
+    valueFields[id].value = document.getElementById(`valueInput${id}`).value
+    valueFields[id].hasAnswered = true
 
-const submitBtn = document.querySelector("#submit-btn")
-submitBtn.addEventListener("click", function(){
+    document.getElementById(`valueField${id}`)
+        .innerHTML = getHtml(id)
+}
+function render(totalCount=false, totalDays=false){
+    fullHtml = ""
+    for(let i = 0; i < valueFields.length; i++){
+        if(!totalCount && !totalDays){
+            fullHtml += getHtml(i, div=true)
+        }else{
+            const weight = parseInt(valueFields[i].value) / total
+            const amountOfDays = (weight*totalDays).toFixed(2)
+            valueFields[i].amountOfDays = amountOfDays
+            fullHtml += getHtml(i, div=false, replace=false, final=true)
+        }
+    }
+    dom.valueContainer.innerHTML = fullHtml
+}
 
-    const startDate = startDateInp.value
-    const endDate = endDateInp.value
-    const amt = numberInp.value
-    if(!startDate || !endDate || !amt) return
-    if(amt<=0) return
-
-    const startDateArr = startDate.split("-")
-    const endDateArr = endDate.split("-")
-
-    const yearDiff = endDateArr[0] - startDateArr[0]
-    const monthDiff = endDateArr[1] - startDateArr[1]
-    const dayDiff = endDateArr[2] - startDateArr[2]
-
-    const totalDiff = (yearDiff*365) + (monthDiff*30) + dayDiff
-    const perDay = amt/totalDiff
-
-    let perWeek = (perDay*7)
-    if(perWeek>amt) perWeek = amt
-    else perWeek = perWeek.toFixed(2)
-    let perMonth = (perDay*30)
-    if (perMonth > amt) perMonth = amt
-    else perMonth = perMonth.toFixed(2)
-    let perYear = (perDay*365)
-    if (perYear > amt) perYear = amt
-    else perYear = perYear.toFixed(2)
-
-    amtPerDay.textContent = `Per Day: ${perDay.toFixed(2)}`
-    amtPerWeek.textContent = `Per Week: ${perWeek}`
-    amtPerMonth.textContent = `Per Month: ${perMonth}`
-    amtPerYear.textContent = `Per Year: ${perYear}`
-})
+function captureDates(){
+    if(!dom.startDateInput.value || !dom.endDateInput.value) return false;
+    dates.startDate = dom.startDateInput.valueAsDate
+    dates.endDate = dom.endDateInput.valueAsDate
+    return true
+}
 
 function calculateDiff(){
-    const startDate = startDateInp.valueAsDate
-    const endDate = endDateInp.valueAsDate
-    const dateDiff = endDate - startDate
+    if((!dates.endDate) || (!dates.startDate) || (dates.startDate > dates.endDate)) return false;
+    const dateDiff = dates.endDate - dates.startDate
     return dateDiff
 }
 
+function dateFormat(inputDate) {
+    const date = new Date(inputDate)
 
-const todayBtn = document.querySelector("#today-btn")
-todayBtn.addEventListener("click", function(){
-    console.log(now)
-    startDateInp.valueAsDate = now
-})
+    const day = date.getDate()
+    const month = date.getMonth() + 1
+    const year = date.getFullYear()
 
-const newValue = document.querySelector("#newValue")
-newValue.addEventListener("click", ()=>{
+    let dateString = year.toString() + "-"
+    dateString += month.toString().padStart(2, "0") + "-"
+    dateString += day.toString()
 
-})
+    return dateString;
+}
 
-const submitValue = document.getElementById("value-input-container")
-submitValue.addEventListener("click", (event)=>{
-    if(!event.target.nodeName === "BUTTON"){
-        return
+function calculateDays(ms, total){
+    if(!ms) return;
+    const dayDiff = ms/1000/60/60/24
+    let amtPerDay = total/dayDiff
+    let amtPerWeek = 0
+    let amtPerMonth = 0
+    if(amtPerDay < 1) amtPerWeek = amtPerDay*7;
+    if(amtPerDay < 1 && amtPerWeek < 1) amtPerMonth = amtPerDay*30;
+
+    console.log(amtPerDay, amtPerWeek, amtPerMonth)
+
+    if(amtPerMonth) text = `Amount per Month: ${amtPerMonth%1!=0 ? amtPerMonth.toFixed(2) : amtPerMonth}`
+    else if(amtPerWeek) text = `Amount per Week: ${amtPerWeek%1!=0 ? amtPerWeek.toFixed(2) : amtPerWeek}`
+    else text = `Amount per Day: ${amtPerDay%1!=0 ? amtPerDay.toFixed(2) : amtPerDay}`
+
+    dom.amtPerDay.textContent = text
+    dom.total.textContent = `Total: ${total}`
+    return dayDiff
+}
+
+function displayDays(){
+    for(let i = 0; i < valueFields.length; i++){
+        let totalDays = valueFields[i].amountOfDays
+        let months = 0
+        let weeks = 0
+
+        if(totalDays > 30) months = Math.floor(totalDays / 30);
+        totalDays -= months*30
+
+        if(totalDays > 7) weeks = Math.floor(totalDays / 7);
+        totalDays -= weeks*7
+
+        if(totalDays % 1 != 1) totalDays = totalDays.toFixed(2);
+
+        document.getElementById(`timeForCompletion${i}`)
+            .textContent = `
+                ${months ? `${months} ${months > 1 ? "months" : "month"} / ` : ""}
+                ${weeks ? `${weeks} ${weeks > 1 ? "weeks" : "week"} / ` : ""}
+                ${totalDays} ${totalDays === 1 ? "day" : "days"}`
     }
+}
 
+//EVENT LISTENERS
+dom.todayBtn.addEventListener("click", ()=>{
+    dates.startDate = dates.now
+    dom.startDateInput.value = dateFormat(dates.startDate)
+})
+
+dom.newValue.addEventListener("click", ()=>{
+    newValue = {
+        hasAnswered: false,
+        value: null,
+        amountOfDays: null
+    }
+    valueFields.push(newValue)
+
+    tempEl = document.createElement("div")
+    tempEl.id = `valueField${valueFields.length-1}`
+    tempEl.classList.add(`value-field`)
+    tempEl.innerHTML = getHtml(valueFields.length-1)
+
+    dom.valueContainer.appendChild(tempEl)
+})
+
+dom.valueContainer.addEventListener("click", (event)=>{
+    if((!event.target.nodeName === "BUTTON") || (!event.target.nodeName === "P"));
     let buttonId = event.target.id
     
     if(buttonId.startsWith("valSubmitBtn")){
-        buttonId = buttonId.replace("valSubmitBtn", "")
+        saveValueInput(parseInt(buttonId.replace("valSubmitBtn", "")))
     }
     else if(buttonId.startsWith("valDeleteBtn")){
+        buttonId = parseInt(buttonId.replace("valDeleteBtn", ""))
+        valueFields.splice(buttonId, 1)
+        render()
 
     }
+    else if(buttonId.startsWith("valP")){
+        buttonId = parseInt(buttonId.replace("valP", ""))
+        document.getElementById(`valueField${buttonId}`)
+            .innerHTML = getHtml(buttonId, div=false, replace=true)
+
+        const valInp = document.getElementById(`valueInput${buttonId}`)
+        valInp.focus()
+
+        const tempval = valInp.value
+        valInp.value = ""
+        valInp.value = tempval
+    }
+})
+
+dom.valueContainer.addEventListener("focusout", (event)=>{
+    if(!event.target.nodeName === "INPUT") return;
+    buttonId = parseInt(event.target.id.replace("valueInput", ""))
+    saveValueInput(buttonId)
+})
+
+dom.submitBtn.addEventListener("click", ()=>{
+    total = 0
+    captureDates()
+    for(let i = 0; i<valueFields.length; i++){
+        if(!valueFields[i].hasAnswered) return;
+        total += parseInt(valueFields[i].value)
+    }
+    totalDays = calculateDays(calculateDiff(), total)
+    render(total, totalDays)
+    displayDays()
 })

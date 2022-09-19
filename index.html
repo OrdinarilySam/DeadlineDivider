@@ -14,21 +14,21 @@
     <div class="container">
         <h1 id="title">Deadline Divider</h1>
         <div class="dates">
-            <div class="date-inputs">
-                <input type="date" id="start-date-inp" class="date-input">
-                <input type="date" id="end-date-inp" class="date-input">
+            <div class="start-date">
+                <input type="date" id="startDateInput" class="date-input">
+                <button id="todayBtn" class="today-btn">⟲</button>
             </div>
-            <input type="number" id="number-inp">
-            <button id="today-btn">Today</button>
+            <input type="date" id="endDateInput" class="date-input">
         </div>
-        <button id="submit-btn">Submit</button>
-        <fieldset class="work-container">
-            <legend>Amount</legend>
-            <p class="amt" id="amt-per-year">Per Year: </p>
-            <p class="amt" id="amt-per-month">Per Month: </p>
-            <p class="amt" id="amt-per-week">Per Week: </p>
-            <p class="amt" id="amt-per-day">Per Day: </p>
-        </fieldset>
+        <div class="value-container" id="valueContainer">
+            
+        </div>
+        <button id="newValueBtn" class="main-btn new-value-btn">New Value</button>
+        <button id="submitBtn" class="main-btn submit-btn">Submit</button>
+        <div class="final-container" id="finalContainer">
+            <p class="total" id="total"></p>
+            <p class="amt-per-day" id="amtPerDay"></p>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
