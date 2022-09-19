@@ -111,8 +111,18 @@ function dateFormat(inputDate) {
 
 function calculateDays(ms, total){
     if(!ms) return;
-    dayDiff = ms/1000/60/60/24
-    dom.amtPerDay.textContent = `Amount per day: ${total/dayDiff}`
+    const dayDiff = ms/1000/60/60/24
+    let amtPerDay = total/dayDiff
+    let amtPerWeek = 0
+    let amtPerMonth = 0
+    if(amtPerDay < 1) amtPerWeek = amtPerDay*7;
+    if(amtPerWeek < 1) amtPerMonth = amtPerDay*30;
+
+    if(amtPerMonth) text = `Amount per Month: ${amtPerMonth%1!=0 ? amtPerMonth.toFixed(2) : amtPerMonth}`
+    else if(amtPerWeek) text = `Amount per Week: ${amtPerWeek%1!=0 ? amtPerWeek.toFixed(2) : amtPerWeek}`
+    else text = `Amount per Day: ${amtPerDay%1!=0 ? amtPerDay.toFixed(2) : amtPerDay}`
+
+    dom.amtPerDay.textContent = text
     dom.total.textContent = `Total: ${total}`
     return dayDiff
 }
