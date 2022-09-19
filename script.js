@@ -7,15 +7,12 @@ let dates = {
 let dom = {
     "startDateInput": document.getElementById("startDateInput"),
     "endDateInput": document.getElementById("endDateInput"),
-    "amtPerDay": document.getElementById("amtPerDay"),
-    "amtPerWeek": document.getElementById("amtPerWeek"),
-    "amtPerMonth": document.getElementById("amtPerMonth"),
-    "amtPerYear": document.getElementById("amtPerYear"),
     "submitBtn": document.getElementById("submitBtn"),
     "todayBtn": document.getElementById("todayBtn"),
     "newValue": document.getElementById("newValueBtn"),
     "valueContainer": document.getElementById("valueContainer"),
-    "totalCount": document.getElementById("totalCount")
+    "total": document.getElementById("total"),
+    "amtPerDay": document.getElementById("amtPerDay")
 }
 let valueFields = []
 
@@ -134,7 +131,8 @@ function setStartAsToday(){
 function createNewValue(){
     newValue = {
         hasAnswered: false,
-        value: null
+        value: null,
+        weight: null
     }
     tempEl = document.createElement("div")
     tempEl.id = `valueField${valueFields.length}`
@@ -151,6 +149,7 @@ function createNewValue(){
 }
 
 function calculateDiff(){
+    if((!dates.endDate) || (!dates.startDate) || (dates.startDate > dates.endDate)) return false;
     const dateDiff = dates.endDate - dates.startDate
     return dateDiff
 }
@@ -158,22 +157,23 @@ function calculateDiff(){
 
 dom.submitBtn.addEventListener("click", ()=>{
     total = 0
+    captureDates()
     for(let i = 0; i<valueFields.length; i++){
         if(!valueFields[i].hasAnswered) return;
         total += parseInt(valueFields[i].value)
     }
-    dom.totalCount.innerText = `Total: ${total}`
     renderFinal(total)
+    stuff(calculateDiff(), total)
 })
 
 function renderFinal(total){
     finalHtml = ""
     for(let i = 0; i<valueFields.length; i++){
         weight = parseInt(valueFields[i].value) / total
+        valueFields[i].weight = weight
         finalHtml += `
-            <div class="final-field" id="finalField${i}">
-                <p id="finalP${i}" class="final-p">${valueFields[i].value}</p>
-                <p class="final-weight">${weight}</p>
+            <div class="final-field">
+                <p class="final-p">${valueFields[i].value}</p>
             </div>
         `
     }
@@ -192,6 +192,13 @@ function dateFormat(inputDate) {
     dateString += day.toString()
 
     return dateString;
+}
+
+function stuff(ms, total){
+    if(!ms) return;
+    dayDiff = ms/1000/60/60/24
+    dom.amtPerDay.textContent = `Amount per day: ${total/dayDiff}`
+    dom.total.textContent = `Total: ${total}`
 }
 
 // submitBtn.addEventListener("click", function(){
