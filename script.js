@@ -1,4 +1,4 @@
-
+// GLOBAL VARIABLES
 let dates = {
     "now": new Date(),
     "startDate": null,
@@ -14,7 +14,9 @@ let dom = {
     "total": document.getElementById("total"),
     "amtPerDay": document.getElementById("amtPerDay")
 }
+let valueFields = []
 
+// FUNCTIONS
 function getHtml(id, div=false, replace=false, final=false){
     let placeholder = ""
 
@@ -22,7 +24,7 @@ function getHtml(id, div=false, replace=false, final=false){
         placeholder = `
             <div class="final-field">
                 <p class="final-p">${valueFields[id].value}</p>
-                <p class="amount-of-days" id="amountOfDays${id}></p>
+                <p class="amount-of-days" id="timeForCompletion${id}"></p>
             </div>`
     }
     else if(!valueFields[id].hasAnswered || replace){
@@ -50,77 +52,36 @@ function getHtml(id, div=false, replace=false, final=false){
     return placeholder
 }
 
-let valueFields = []
-
-dom.todayBtn.addEventListener("click", setStartAsToday)
-dom.newValue.addEventListener("click", createNewValue)
-
-function saveValueInput(buttonId){
+function saveValueInput(id){
     try {
-        buttonId = parseInt(buttonId.replace("valSubmitBtn", ""))
-    } catch (error) {
-        
-    }
-    try {
-        inputValue = parseInt(document.getElementById(`valueInput${buttonId}`).value)
+        inputValue = parseInt(document.getElementById(`valueInput${id}`).value)
         if(inputValue <= 0) throw "Input is not a valid number"
         if(!inputValue) throw "No input"
     } catch (error) {
-        document.getElementById(`valueInput${buttonId}`).style.border = "1px solid red"
+        document.getElementById(`valueInput${id}`).style.border = "1px solid red"
         return
     }
-    valueFields[buttonId].value = document.getElementById(`valueInput${buttonId}`).value
-    valueFields[buttonId].hasAnswered = true
+    valueFields[id].value = document.getElementById(`valueInput${id}`).value
+    valueFields[id].hasAnswered = true
 
-    document.getElementById(`valueField${buttonId}`)
-        .innerHTML = getHtml(buttonId)
+    document.getElementById(`valueField${id}`)
+        .innerHTML = getHtml(id)
 }
-function renderAll(){
-    fullString = ""
+function render(totalCount=false, totalDays=false){
+    fullHtml = ""
     for(let i = 0; i < valueFields.length; i++){
-        fullString += getHtml(i, div=true)
+        if(!totalCount && !totalDays){
+            fullHtml += getHtml(i, div=true)
+        }else{
+            const weight = parseInt(valueFields[i].value) / total
+            const amountOfDays = (weight*totalDays).toFixed(2)
+            valueFields[i].amountOfDays = amountOfDays
+            fullHtml += getHtml(i, div=false, replace=false, final=true)
+        }
     }
-    dom.valueContainer.innerHTML = fullString
+    dom.valueContainer.innerHTML = fullHtml
 }
 
-// This event listener checks for the submit button, the delete button, and a click on the paragraph
-dom.valueContainer.addEventListener("click", (event)=>{
-    if((!event.target.nodeName === "BUTTON") || (!event.target.nodeName === "P"));
-    let buttonId = event.target.id
-    
-    if(buttonId.startsWith("valSubmitBtn")){
-        saveValueInput(buttonId)
-    }
-    else if(buttonId.startsWith("valDeleteBtn")){
-        // Remove a value field
-        // Render the new values with updated ids
-        buttonId = parseInt(buttonId.replace("valDeleteBtn", ""))
-        valueFields.splice(buttonId, 1)
-        renderAll()
-
-    }
-    else if(buttonId.startsWith("valP")){
-        // Change the text field to an input field.
-        buttonId = parseInt(buttonId.replace("valP", ""))
-        document.getElementById(`valueField${buttonId}`)
-            .innerHTML = getHtml(buttonId, div=false, replace=true)
-
-        const valInp = document.getElementById(`valueInput${buttonId}`)
-        valInp.focus()
-
-        const tempval = valInp.value
-        valInp.value = ""
-        valInp.value = tempval
-    }
-})
-dom.valueContainer.addEventListener("focusout", (event)=>{
-    if(!event.target.nodeName === "INPUT") return;
-    buttonId = parseInt(event.target.id.replace("valueInput", ""))
-    saveValueInput(buttonId)
-})
-
-
-// Small buttons and functions
 function captureDates(){
     if(!dom.startDateInput.value || !dom.endDateInput.value) return false;
     dates.startDate = dom.startDateInput.valueAsDate
@@ -128,53 +89,10 @@ function captureDates(){
     return true
 }
 
-function setStartAsToday(){
-    dates.startDate = dates.now
-    dom.startDateInput.value = dateFormat(dates.startDate)
-}
-
-function createNewValue(){
-    newValue = {
-        hasAnswered: false,
-        value: null
-    }
-    valueFields.push(newValue)
-
-    tempEl = document.createElement("div")
-    tempEl.id = `valueField${valueFields.length-1}`
-    tempEl.classList.add(`value-field`)
-    tempEl.innerHTML = getHtml(valueFields.length-1)
-
-    dom.valueContainer.appendChild(tempEl)
-}
-
 function calculateDiff(){
     if((!dates.endDate) || (!dates.startDate) || (dates.startDate > dates.endDate)) return false;
     const dateDiff = dates.endDate - dates.startDate
     return dateDiff
-}
-
-
-dom.submitBtn.addEventListener("click", ()=>{
-    total = 0
-    captureDates()
-    for(let i = 0; i<valueFields.length; i++){
-        if(!valueFields[i].hasAnswered) return;
-        total += parseInt(valueFields[i].value)
-    }
-    totalDays = stuff(calculateDiff(), total)
-    renderFinal(total, totalDays)
-})
-
-function renderFinal(total, totalDays){
-    finalHtml = ""
-    for(let i = 0; i<valueFields.length; i++){
-        weight = parseInt(valueFields[i].value) / total
-        console.log(weight, totalDays)
-        amountOfDays = (weight*totalDays).toFixed(2)
-        finalHtml += getHtml(i, div=false, replace=false, final=true)
-    }
-    dom.valueContainer.innerHTML = finalHtml
 }
 
 function dateFormat(inputDate) {
@@ -191,10 +109,99 @@ function dateFormat(inputDate) {
     return dateString;
 }
 
-function stuff(ms, total){
+function calculateDays(ms, total){
     if(!ms) return;
     dayDiff = ms/1000/60/60/24
     dom.amtPerDay.textContent = `Amount per day: ${total/dayDiff}`
     dom.total.textContent = `Total: ${total}`
     return dayDiff
 }
+
+function displayDays(){
+    for(let i = 0; i < valueFields.length; i++){
+        let totalDays = valueFields[i].amountOfDays
+        let months = 0
+        let weeks = 0
+
+        if(totalDays > 30) months = Math.floor(totalDays / 30);
+        totalDays -= months*30
+
+        if(totalDays > 7) weeks = Math.floor(totalDays / 7);
+        totalDays -= weeks*7
+
+        if(totalDays % 1 != 1) totalDays = totalDays.toFixed(2);
+
+        document.getElementById(`timeForCompletion${i}`)
+            .textContent = `
+                ${months ? `${months} ${months > 1 ? "months" : "month"} / ` : ""}
+                ${weeks ? `${weeks} ${weeks > 1 ? "weeks" : "week"} / ` : ""}
+                ${totalDays} ${totalDays === 1 ? "day" : "days"}`
+    }
+}
+
+//EVENT LISTENERS
+dom.todayBtn.addEventListener("click", ()=>{
+    dates.startDate = dates.now
+    dom.startDateInput.value = dateFormat(dates.startDate)
+})
+
+dom.newValue.addEventListener("click", ()=>{
+    newValue = {
+        hasAnswered: false,
+        value: null,
+        amountOfDays: null
+    }
+    valueFields.push(newValue)
+
+    tempEl = document.createElement("div")
+    tempEl.id = `valueField${valueFields.length-1}`
+    tempEl.classList.add(`value-field`)
+    tempEl.innerHTML = getHtml(valueFields.length-1)
+
+    dom.valueContainer.appendChild(tempEl)
+})
+
+dom.valueContainer.addEventListener("click", (event)=>{
+    if((!event.target.nodeName === "BUTTON") || (!event.target.nodeName === "P"));
+    let buttonId = event.target.id
+    
+    if(buttonId.startsWith("valSubmitBtn")){
+        saveValueInput(parseInt(buttonId.replace("valSubmitBtn", "")))
+    }
+    else if(buttonId.startsWith("valDeleteBtn")){
+        buttonId = parseInt(buttonId.replace("valDeleteBtn", ""))
+        valueFields.splice(buttonId, 1)
+        render()
+
+    }
+    else if(buttonId.startsWith("valP")){
+        buttonId = parseInt(buttonId.replace("valP", ""))
+        document.getElementById(`valueField${buttonId}`)
+            .innerHTML = getHtml(buttonId, div=false, replace=true)
+
+        const valInp = document.getElementById(`valueInput${buttonId}`)
+        valInp.focus()
+
+        const tempval = valInp.value
+        valInp.value = ""
+        valInp.value = tempval
+    }
+})
+
+dom.valueContainer.addEventListener("focusout", (event)=>{
+    if(!event.target.nodeName === "INPUT") return;
+    buttonId = parseInt(event.target.id.replace("valueInput", ""))
+    saveValueInput(buttonId)
+})
+
+dom.submitBtn.addEventListener("click", ()=>{
+    total = 0
+    captureDates()
+    for(let i = 0; i<valueFields.length; i++){
+        if(!valueFields[i].hasAnswered) return;
+        total += parseInt(valueFields[i].value)
+    }
+    totalDays = calculateDays(calculateDiff(), total)
+    render(total, totalDays)
+    displayDays()
+})
