@@ -122,3 +122,9 @@ form{
     margin: 0 auto;
     align-items: center;
 }
+.final-field{
+    display: flex;
+    border: 1px solid black;
+    justify-content: space-around;
+    margin: 0.25em;
+}
