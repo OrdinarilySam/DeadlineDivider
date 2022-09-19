@@ -131,8 +131,7 @@ function setStartAsToday(){
 function createNewValue(){
     newValue = {
         hasAnswered: false,
-        value: null,
-        weight: null
+        value: null
     }
     tempEl = document.createElement("div")
     tempEl.id = `valueField${valueFields.length}`
@@ -162,18 +161,20 @@ dom.submitBtn.addEventListener("click", ()=>{
         if(!valueFields[i].hasAnswered) return;
         total += parseInt(valueFields[i].value)
     }
-    renderFinal(total)
-    stuff(calculateDiff(), total)
+    totalDays = stuff(calculateDiff(), total)
+    renderFinal(total, totalDays)
 })
 
-function renderFinal(total){
+function renderFinal(total, totalDays){
     finalHtml = ""
     for(let i = 0; i<valueFields.length; i++){
         weight = parseInt(valueFields[i].value) / total
-        valueFields[i].weight = weight
+        console.log(weight, totalDays)
+        amountOfDays = (weight*totalDays).toFixed(2)
         finalHtml += `
             <div class="final-field">
                 <p class="final-p">${valueFields[i].value}</p>
+                <p class="amount-of-days">${amountOfDays} days</p>
             </div>
         `
     }
@@ -199,6 +200,7 @@ function stuff(ms, total){
     dayDiff = ms/1000/60/60/24
     dom.amtPerDay.textContent = `Amount per day: ${total/dayDiff}`
     dom.total.textContent = `Total: ${total}`
+    return dayDiff
 }
 
 // submitBtn.addEventListener("click", function(){
