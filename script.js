@@ -14,6 +14,42 @@ let dom = {
     "total": document.getElementById("total"),
     "amtPerDay": document.getElementById("amtPerDay")
 }
+
+function getHtml(id, div=false, replace=false, final=false){
+    let placeholder = ""
+
+    if(final){
+        placeholder = `
+            <div class="final-field">
+                <p class="final-p">${valueFields[id].value}</p>
+                <p class="amount-of-days" id="amountOfDays${id}></p>
+            </div>`
+    }
+    else if(!valueFields[id].hasAnswered || replace){
+        placeholder = `
+            <form action="submit" onsubmit="return false">
+                <input type="number" min="0" 
+                    ${replace ? `placeholder="${valueFields[id].value}" value="${valueFields[id].value}"` : `placeholder="num"`} 
+                    id="valueInput${id}" class="value-input">
+                <button id="valSubmitBtn${id}" class="val-btn val-submit-btn" type="submit">+</button>
+            </form>`
+    }else{
+        placeholder = `
+            <form onsubmit="return false">
+                <p id="valP${id}" class="val-p">${valueFields[id].value}</p>
+                <button id="valDeleteBtn${id}" class="val-btn val-delete-btn">-</button>
+            </form>`
+    }
+
+    if(div){
+        placeholder = `
+            <div class="value-field" id="valueField${id}">
+                ${placeholder}
+            </div>`
+    }
+    return placeholder
+}
+
 let valueFields = []
 
 dom.todayBtn.addEventListener("click", setStartAsToday)
@@ -36,37 +72,13 @@ function saveValueInput(buttonId){
     valueFields[buttonId].value = document.getElementById(`valueInput${buttonId}`).value
     valueFields[buttonId].hasAnswered = true
 
-    placeholder = `
-        <form onsubmit="return false">
-            <p id="valP${buttonId}" class="val-p">${valueFields[buttonId].value}</p>
-            <button id="valDeleteBtn${buttonId}" class="val-btn val-delete-btn">-</button>
-        </form>
-    `
     document.getElementById(`valueField${buttonId}`)
-        .innerHTML = placeholder
+        .innerHTML = getHtml(buttonId)
 }
 function renderAll(){
     fullString = ""
     for(let i = 0; i < valueFields.length; i++){
-        if(valueFields[i].hasAnswered){
-            fullString += `
-                <div class="value-field" id="valueField${i}">
-                    <form onsubmit="return false">
-                        <p id="valP${i}" class="val-p">${valueFields[i].value}</p>
-                        <button id="valDeleteBtn${i}" class="val-btn val-delete-btn">-</button>
-                    </form>
-                </div>
-            `
-        }else{
-            fullString += `
-                <div class="value-field" id="valueField${i}">
-                    <form action="submit" onsubmit="return false">
-                        <input type="number" min="0" placeholder="num" id="valueInput${i}" class="value-input">
-                        <button id="valSubmitBtn${i}" class="val-btn val-submit-btn" type="submit">+</button>
-                    </form>
-                </div>
-            `
-        }
+        fullString += getHtml(i, div=true)
     }
     dom.valueContainer.innerHTML = fullString
 }
@@ -82,7 +94,6 @@ dom.valueContainer.addEventListener("click", (event)=>{
     else if(buttonId.startsWith("valDeleteBtn")){
         // Remove a value field
         // Render the new values with updated ids
-        console.log("button tried to delete with an id", buttonId)
         buttonId = parseInt(buttonId.replace("valDeleteBtn", ""))
         valueFields.splice(buttonId, 1)
         renderAll()
@@ -91,14 +102,8 @@ dom.valueContainer.addEventListener("click", (event)=>{
     else if(buttonId.startsWith("valP")){
         // Change the text field to an input field.
         buttonId = parseInt(buttonId.replace("valP", ""))
-        placeholder = `
-        <form action="submit" onsubmit="return false">
-            <input type="number" min="0" placeholder="${valueFields[buttonId].value}" value="${valueFields[buttonId].value}" id="valueInput${buttonId}" class="value-input">
-            <button id="valSubmitBtn${buttonId}" class="val-btn val-submit-btn" type="submit">+</button>
-        </form>
-        `
         document.getElementById(`valueField${buttonId}`)
-            .innerHTML = placeholder
+            .innerHTML = getHtml(buttonId, div=false, replace=true)
 
         const valInp = document.getElementById(`valueInput${buttonId}`)
         valInp.focus()
@@ -109,7 +114,7 @@ dom.valueContainer.addEventListener("click", (event)=>{
     }
 })
 dom.valueContainer.addEventListener("focusout", (event)=>{
-    if(!event.target.nodeName === "INPUT") console.log("not an input");
+    if(!event.target.nodeName === "INPUT") return;
     buttonId = parseInt(event.target.id.replace("valueInput", ""))
     saveValueInput(buttonId)
 })
@@ -133,18 +138,14 @@ function createNewValue(){
         hasAnswered: false,
         value: null
     }
-    tempEl = document.createElement("div")
-    tempEl.id = `valueField${valueFields.length}`
-    tempEl.classList.add(`value-field`)
-    tempEl.innerHTML = `
-        <form action="submit" onsubmit="return false">
-            <input type="number" min="0" placeholder="num" id="valueInput${valueFields.length}" class="value-input">
-            <button id="valSubmitBtn${valueFields.length}" class="val-btn val-submit-btn" type="submit">+</button>
-        </form>
-        `
     valueFields.push(newValue)
+
+    tempEl = document.createElement("div")
+    tempEl.id = `valueField${valueFields.length-1}`
+    tempEl.classList.add(`value-field`)
+    tempEl.innerHTML = getHtml(valueFields.length-1)
+
     dom.valueContainer.appendChild(tempEl)
-    // renderFields()
 }
 
 function calculateDiff(){
@@ -171,12 +172,7 @@ function renderFinal(total, totalDays){
         weight = parseInt(valueFields[i].value) / total
         console.log(weight, totalDays)
         amountOfDays = (weight*totalDays).toFixed(2)
-        finalHtml += `
-            <div class="final-field">
-                <p class="final-p">${valueFields[i].value}</p>
-                <p class="amount-of-days">${amountOfDays} days</p>
-            </div>
-        `
+        finalHtml += getHtml(i, div=false, replace=false, final=true)
     }
     dom.valueContainer.innerHTML = finalHtml
 }
