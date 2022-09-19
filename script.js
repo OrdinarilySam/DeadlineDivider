@@ -116,7 +116,9 @@ function calculateDays(ms, total){
     let amtPerWeek = 0
     let amtPerMonth = 0
     if(amtPerDay < 1) amtPerWeek = amtPerDay*7;
-    if(amtPerWeek < 1) amtPerMonth = amtPerDay*30;
+    if(amtPerDay < 1 && amtPerWeek < 1) amtPerMonth = amtPerDay*30;
+
+    console.log(amtPerDay, amtPerWeek, amtPerMonth)
 
     if(amtPerMonth) text = `Amount per Month: ${amtPerMonth%1!=0 ? amtPerMonth.toFixed(2) : amtPerMonth}`
     else if(amtPerWeek) text = `Amount per Week: ${amtPerWeek%1!=0 ? amtPerWeek.toFixed(2) : amtPerWeek}`
