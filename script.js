@@ -1,4 +1,6 @@
 // GLOBAL VARIABLES
+let hasSubmitted = false
+
 let dates = {
     "now": new Date(),
     "startDate": null,
@@ -12,7 +14,9 @@ let dom = {
     "newValue": document.getElementById("newValueBtn"),
     "valueContainer": document.getElementById("valueContainer"),
     "total": document.getElementById("total"),
-    "amtPerDay": document.getElementById("amtPerDay")
+    "amtPerDay": document.getElementById("amtPerDay"),
+    "weekendsChk": document.getElementById("weekendsChk"),
+    "resetBtn": document.getElementById("resetBtn")
 }
 let valueFields = []
 
@@ -61,6 +65,7 @@ function saveValueInput(id){
         document.getElementById(`valueInput${id}`).style.border = "1px solid red"
         return
     }
+    dom.resetBtn.style.visibility = "visible"
     valueFields[id].value = document.getElementById(`valueInput${id}`).value
     valueFields[id].hasAnswered = true
 
@@ -216,4 +221,21 @@ dom.submitBtn.addEventListener("click", ()=>{
     totalDays = calculateDays(calculateDiff(), total)
     render(total, totalDays)
     displayDays()
+    dom.newValue.style.visibility = "hidden"
+    dom.resetBtn.style.visibility = "visible"
+    hasSubmitted = true
+})
+
+dom.resetBtn.addEventListener("click", ()=>{
+    if(hasSubmitted){
+        render()
+        hasSubmitted = false
+        dom.newValue.style.visibility = "visible"
+        dom.total.textContent = ""
+        dom.amtPerDay.textContent = ""
+    }else{
+        dom.resetBtn.style.visibility = "hidden"
+        valueFields = []
+        render()
+    }
 })

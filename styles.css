@@ -143,3 +143,12 @@ form{
     justify-content: space-around;
     margin: 0.25em;
 }
+.reset-btn{
+    visibility: hidden;
+}
+.extras {
+    display: flex;
+}
+.checkbox{
+    display: flex;
+}
