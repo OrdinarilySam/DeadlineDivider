@@ -144,11 +144,15 @@ form{
     margin: 0.25em;
 }
 .reset-btn{
-    visibility: hidden;
+    display: none;
 }
 .extras {
     display: flex;
+    justify-content: space-around;
 }
 .checkbox{
     display: flex;
+}
+.hidden-btn{
+    display: none;
 }

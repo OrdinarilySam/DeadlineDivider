@@ -14,18 +14,17 @@ I like how the the inputs turn transparent once you've entered a value, but
 
 ## QOL
 
-- Pushing new value button auto focuses on new value
-- Hitting enter on the input field will create a new input field
-- Clicking the green button will not
+/- Pushing new value button auto focuses on new value 
+/- Hitting enter on the input field will create a new input field
+/- Clicking the green button will not
 
 ## Features
-- New value btn will disappear on submit
+/- New value btn will disappear on submit
 - First input is forced and hardcoded in html
 
-- Reset button that will turn all the values back into inputs
-- If all values are inputs, reset will delete all values
+/- Reset button that will turn all the values back into inputs
+/- If all values are inputs, reset will delete all values
 - Weekend checkbox to include weekends in time calculations
-- Comes pre equipped with a value input that cannot be deleted
 - (maybe) Sections can be named
 - (maybe) An info page explaining how to use it
 - - Just update the readme maybe?

@@ -37,7 +37,8 @@ function getHtml(id, div=false, replace=false, final=false){
                 <input type="number" min="0" 
                     ${replace ? `placeholder="${valueFields[id].value}" value="${valueFields[id].value}"` : `placeholder="num"`} 
                     id="valueInput${id}" class="value-input">
-                <button id="valSubmitBtn${id}" class="val-btn val-submit-btn" type="submit">+</button>
+                <button id="visSubmitBtn${id}" class="val-btn val-submit-btn">+</button>
+                <button id="valSubmitBtn${id}" class="hidden-btn" type="submit"></button>
             </form>`
     }else{
         placeholder = `
@@ -65,7 +66,7 @@ function saveValueInput(id){
         document.getElementById(`valueInput${id}`).style.border = "1px solid red"
         return
     }
-    dom.resetBtn.style.visibility = "visible"
+    dom.resetBtn.style.display = "inline-block"
     valueFields[id].value = document.getElementById(`valueInput${id}`).value
     valueFields[id].hasAnswered = true
 
@@ -156,13 +157,7 @@ function displayDays(){
     }
 }
 
-//EVENT LISTENERS
-dom.todayBtn.addEventListener("click", ()=>{
-    dates.startDate = dates.now
-    dom.startDateInput.value = dateFormat(dates.startDate)
-})
-
-dom.newValue.addEventListener("click", ()=>{
+function createNewValue(){
     newValue = {
         hasAnswered: false,
         value: null,
@@ -175,14 +170,25 @@ dom.newValue.addEventListener("click", ()=>{
     tempEl.classList.add(`value-field`)
     tempEl.innerHTML = getHtml(valueFields.length-1)
 
+    
     dom.valueContainer.appendChild(tempEl)
+    document.getElementById(`valueInput${valueFields.length-1}`).focus()
+}
+
+//EVENT LISTENERS
+dom.todayBtn.addEventListener("click", ()=>{
+    dates.startDate = dates.now
+    dom.startDateInput.value = dateFormat(dates.startDate)
 })
+
+dom.newValue.addEventListener("click", createNewValue)
 
 dom.valueContainer.addEventListener("click", (event)=>{
     if((!event.target.nodeName === "BUTTON") || (!event.target.nodeName === "P"));
     let buttonId = event.target.id
     
     if(buttonId.startsWith("valSubmitBtn")){
+        console.log("button clicked with id", buttonId)
         saveValueInput(parseInt(buttonId.replace("valSubmitBtn", "")))
     }
     else if(buttonId.startsWith("valDeleteBtn")){
@@ -190,6 +196,10 @@ dom.valueContainer.addEventListener("click", (event)=>{
         valueFields.splice(buttonId, 1)
         render()
 
+    }
+    else if(buttonId.startsWith("visSubmitBtn")){
+        console.log("button clicked with id", buttonId)
+        createNewValue()
     }
     else if(buttonId.startsWith("valP")){
         buttonId = parseInt(buttonId.replace("valP", ""))
@@ -215,14 +225,18 @@ dom.submitBtn.addEventListener("click", ()=>{
     total = 0
     captureDates()
     for(let i = 0; i<valueFields.length; i++){
+        if(i == valueFields.length-1 && !valueFields[i].hasAnswered){
+            valueFields.pop()
+            break
+        }
         if(!valueFields[i].hasAnswered) return;
         total += parseInt(valueFields[i].value)
     }
     totalDays = calculateDays(calculateDiff(), total)
     render(total, totalDays)
     displayDays()
-    dom.newValue.style.visibility = "hidden"
-    dom.resetBtn.style.visibility = "visible"
+    dom.newValue.style.display = "none"
+    dom.resetBtn.style.display = "inline-block"
     hasSubmitted = true
 })
 
@@ -230,11 +244,11 @@ dom.resetBtn.addEventListener("click", ()=>{
     if(hasSubmitted){
         render()
         hasSubmitted = false
-        dom.newValue.style.visibility = "visible"
+        dom.newValue.style.display = "inline-block"
         dom.total.textContent = ""
         dom.amtPerDay.textContent = ""
     }else{
-        dom.resetBtn.style.visibility = "hidden"
+        dom.resetBtn.style.display = "none"
         valueFields = []
         render()
     }
