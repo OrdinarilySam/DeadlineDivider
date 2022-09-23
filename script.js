@@ -26,6 +26,7 @@ let valueFields = [
         amountOfDays: null
     }
 ]
+render()
 
 // FUNCTIONS
 function getHtml(id, div=false, replace=false, final=false){
@@ -50,7 +51,7 @@ function getHtml(id, div=false, replace=false, final=false){
         placeholder = `
             <form onsubmit="return false">
                 <p id="valP${id}" class="val-p">${valueFields[id].value}</p>
-                ${id===0 ? "" : `<button id="valDeleteBtn${id}" class="val-btn val-delete-btn">-</button>`}
+                <button id="valDeleteBtn${id}" class="val-btn val-delete-btn">-</button>
             </form>`
     }
 
@@ -67,14 +68,17 @@ function saveValueInput(id){
     try {
         inputValue = parseInt(document.getElementById(`valueInput${id}`).value)
         if(inputValue <= 0) throw "Input is not a valid number"
-        if(!inputValue) throw "No input"
+        if(!inputValue){
+            inputValue = parseInt(document.getElementById(`valueInput${id}`).placeholder)
+        }
+        if(!inputValue) throw "No input and no placeholder"
     } catch (error) {
         document.getElementById(`valueInput${id}`).style.border = "1px solid red"
         return
     }
     dom.resetBtn.style.display = "inline-block"
     dom.spacer.style.width = "10%"
-    valueFields[id].value = document.getElementById(`valueInput${id}`).value
+    valueFields[id].value = inputValue
     valueFields[id].hasAnswered = true
 
     document.getElementById(`valueField${id}`)
@@ -193,13 +197,20 @@ dom.valueContainer.addEventListener("click", (event)=>{
     let buttonId = event.target.id
 
     if(buttonId.startsWith("valDeleteBtn")){
-        buttonId = parseInt(buttonId.replace("valDeleteBtn", ""))
-        valueFields.splice(buttonId, 1)
-        render()
+        if(valueFields.length > 1){
+            buttonId = parseInt(buttonId.replace("valDeleteBtn", ""))
+            valueFields.splice(buttonId, 1)
+            render()
+        }
 
     }
     else if(buttonId.startsWith("visSubmitBtn")){
-        createNewValue()
+        buttonId = parseInt(buttonId.replace("visSubmitBtn", ""))
+        if(buttonId === valueFields.length-1){
+            createNewValue()
+        }else{
+            saveValueInput(buttonId)
+        }
     }
     else if(buttonId.startsWith("valP")){
         buttonId = parseInt(buttonId.replace("valP", ""))
@@ -217,6 +228,7 @@ dom.valueContainer.addEventListener("click", (event)=>{
 
 dom.valueContainer.addEventListener("focusout", (event)=>{
     if(!event.target.nodeName === "INPUT") return;
+    if(valueFields.length === 1) return;
     buttonId = parseInt(event.target.id.replace("valueInput", ""))
     saveValueInput(buttonId)
 })
