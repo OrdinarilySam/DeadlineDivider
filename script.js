@@ -51,7 +51,7 @@ function getHtml(id, div=false, replace=false, final=false){
         placeholder = `
             <form onsubmit="return false">
                 <p id="valP${id}" class="val-p">${valueFields[id].value}</p>
-                <button id="valDeleteBtn${id}" class="val-btn val-delete-btn">-</button>
+                ${valueFields.length===1 ? "" : `<button id="valDeleteBtn${id}" class="val-btn val-delete-btn">-</button>`}
             </form>`
     }
 
