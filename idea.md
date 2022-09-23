@@ -29,6 +29,9 @@ I like how the the inputs turn transparent once you've entered a value, but
 - (maybe) An info page explaining how to use it
 - - Just update the readme maybe?
 
+Extras:
+/- Empty value boxes wont count towards total
+
 ## Organization
 
 - (maybe) Find out how to put some functions in other files to keep the main script file clean
