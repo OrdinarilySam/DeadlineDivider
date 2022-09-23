@@ -16,7 +16,8 @@ let dom = {
     "total": document.getElementById("total"),
     "amtPerDay": document.getElementById("amtPerDay"),
     "weekendsChk": document.getElementById("weekendsChk"),
-    "resetBtn": document.getElementById("resetBtn")
+    "resetBtn": document.getElementById("resetBtn"),
+    "spacer": document.getElementById("spacer")
 }
 let valueFields = []
 
@@ -67,6 +68,7 @@ function saveValueInput(id){
         return
     }
     dom.resetBtn.style.display = "inline-block"
+    dom.spacer.style.width = "10%"
     valueFields[id].value = document.getElementById(`valueInput${id}`).value
     valueFields[id].hasAnswered = true
 
@@ -79,7 +81,7 @@ function render(totalCount=false, totalDays=false){
         if(!totalCount && !totalDays){
             fullHtml += getHtml(i, div=true)
         }else{
-            const weight = parseInt(valueFields[i].value) / total
+            const weight = parseInt(valueFields[i].value) / totalCount
             const amountOfDays = (weight*totalDays).toFixed(2)
             valueFields[i].amountOfDays = amountOfDays
             fullHtml += getHtml(i, div=false, replace=false, final=true)
@@ -123,8 +125,6 @@ function calculateDays(ms, total){
     let amtPerMonth = 0
     if(amtPerDay < 1) amtPerWeek = amtPerDay*7;
     if(amtPerDay < 1 && amtPerWeek < 1) amtPerMonth = amtPerDay*30;
-
-    console.log(amtPerDay, amtPerWeek, amtPerMonth)
 
     if(amtPerMonth) text = `Amount per Month: ${amtPerMonth%1!=0 ? amtPerMonth.toFixed(2) : amtPerMonth}`
     else if(amtPerWeek) text = `Amount per Week: ${amtPerWeek%1!=0 ? amtPerWeek.toFixed(2) : amtPerWeek}`
@@ -188,7 +188,6 @@ dom.valueContainer.addEventListener("click", (event)=>{
     let buttonId = event.target.id
     
     if(buttonId.startsWith("valSubmitBtn")){
-        console.log("button clicked with id", buttonId)
         saveValueInput(parseInt(buttonId.replace("valSubmitBtn", "")))
     }
     else if(buttonId.startsWith("valDeleteBtn")){
@@ -198,7 +197,6 @@ dom.valueContainer.addEventListener("click", (event)=>{
 
     }
     else if(buttonId.startsWith("visSubmitBtn")){
-        console.log("button clicked with id", buttonId)
         createNewValue()
     }
     else if(buttonId.startsWith("valP")){
@@ -222,21 +220,22 @@ dom.valueContainer.addEventListener("focusout", (event)=>{
 })
 
 dom.submitBtn.addEventListener("click", ()=>{
-    total = 0
+    let total = 0
     captureDates()
     for(let i = 0; i<valueFields.length; i++){
-        if(i == valueFields.length-1 && !valueFields[i].hasAnswered){
-            valueFields.pop()
-            break
-        }
-        if(!valueFields[i].hasAnswered) return;
-        total += parseInt(valueFields[i].value)
+        if(!valueFields[i].hasAnswered){
+            valueFields.pop(i)
+            i--
+        }else{
+            total += parseInt(valueFields[i].value)
+        } 
     }
     totalDays = calculateDays(calculateDiff(), total)
     render(total, totalDays)
     displayDays()
     dom.newValue.style.display = "none"
     dom.resetBtn.style.display = "inline-block"
+    dom.spacer.style.width = "10%"
     hasSubmitted = true
 })
 
@@ -249,6 +248,7 @@ dom.resetBtn.addEventListener("click", ()=>{
         dom.amtPerDay.textContent = ""
     }else{
         dom.resetBtn.style.display = "none"
+        dom.spacer.style.width = "0%"
         valueFields = []
         render()
     }
