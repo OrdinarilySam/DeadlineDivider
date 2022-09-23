@@ -19,7 +19,13 @@ let dom = {
     "resetBtn": document.getElementById("resetBtn"),
     "spacer": document.getElementById("spacer")
 }
-let valueFields = []
+let valueFields = [
+    {
+        hasAnswered: false,
+        value: null,
+        amountOfDays: null
+    }
+]
 
 // FUNCTIONS
 function getHtml(id, div=false, replace=false, final=false){
@@ -39,13 +45,12 @@ function getHtml(id, div=false, replace=false, final=false){
                     ${replace ? `placeholder="${valueFields[id].value}" value="${valueFields[id].value}"` : `placeholder="num"`} 
                     id="valueInput${id}" class="value-input">
                 <button id="visSubmitBtn${id}" class="val-btn val-submit-btn">+</button>
-                <button id="valSubmitBtn${id}" class="hidden-btn" type="submit"></button>
             </form>`
     }else{
         placeholder = `
             <form onsubmit="return false">
                 <p id="valP${id}" class="val-p">${valueFields[id].value}</p>
-                <button id="valDeleteBtn${id}" class="val-btn val-delete-btn">-</button>
+                ${id===0 ? "" : `<button id="valDeleteBtn${id}" class="val-btn val-delete-btn">-</button>`}
             </form>`
     }
 
@@ -186,11 +191,8 @@ dom.newValue.addEventListener("click", createNewValue)
 dom.valueContainer.addEventListener("click", (event)=>{
     if((!event.target.nodeName === "BUTTON") || (!event.target.nodeName === "P"));
     let buttonId = event.target.id
-    
-    if(buttonId.startsWith("valSubmitBtn")){
-        saveValueInput(parseInt(buttonId.replace("valSubmitBtn", "")))
-    }
-    else if(buttonId.startsWith("valDeleteBtn")){
+
+    if(buttonId.startsWith("valDeleteBtn")){
         buttonId = parseInt(buttonId.replace("valDeleteBtn", ""))
         valueFields.splice(buttonId, 1)
         render()
@@ -249,7 +251,11 @@ dom.resetBtn.addEventListener("click", ()=>{
     }else{
         dom.resetBtn.style.display = "none"
         dom.spacer.style.width = "0%"
-        valueFields = []
+        valueFields = [ {
+            hasAnswered: false,
+            value: null,
+            amountOfDays: null
+        }]
         render()
     }
 })
