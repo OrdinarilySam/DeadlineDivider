@@ -24,7 +24,7 @@ I like how the the inputs turn transparent once you've entered a value, but
 
 /- Reset button that will turn all the values back into inputs
 /- If all values are inputs, reset will delete all values
-- Weekend checkbox to include weekends in time calculations
+/- Weekend checkbox to include weekends in time calculations
 - (maybe) Sections can be named
 - (maybe) An info page explaining how to use it
 - - Just update the readme maybe?

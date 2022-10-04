@@ -2,10 +2,10 @@
 let hasSubmitted = false
 
 let dates = {
-    "now": new Date(),
     "startDate": null,
     "endDate": null
 }
+
 let dom = {
     "startDateInput": document.getElementById("startDateInput"),
     "endDateInput": document.getElementById("endDateInput"),
@@ -124,7 +124,8 @@ function createNewValue(){
 
 //EVENT LISTENERS
 dom.todayBtn.addEventListener("click", ()=>{
-    dates.startDate = dates.now
+    dates.startDate = new Date()
+    dates.startDate.setHours(0, 0, 0, 0)
     dom.startDateInput.valueAsDate = dates.startDate
 })
 
@@ -192,9 +193,10 @@ dom.submitBtn.addEventListener("click", ()=>{
     if(!dom.startDateInput.value || !dom.endDateInput.value) return;
     if(dates.startDate > dates.endDate) return;
 
-    dates.startDate = dom.startDateInput.valueAsDate
+    dates.startDate = dom.startDateInput.valueAsDate;
     dates.endDate = dom.endDateInput.valueAsDate
-    ms = dates.endDate - dates.startDate
+    dates.startDate.setMinutes(dates.startDate.getMinutes()+dates.startDate.getTimezoneOffset())
+    dates.endDate.setMinutes(dates.endDate.getMinutes()+dates.endDate.getTimezoneOffset())
 
     let total = 0
     for(let i = 0; i<valueFields.length; i++){
@@ -206,7 +208,30 @@ dom.submitBtn.addEventListener("click", ()=>{
         } 
     }
 
-    const dayDiff = ms/1000/60/60/24
+    ms = dates.endDate - dates.startDate
+    let dayDiff = ms/1000/60/60/24
+
+    if(!dom.weekendsChk.checked){
+        startDay = dates.startDate.getDay()
+        if(startDay == 0) startDay = 6;
+        else startDay--;
+
+        endDay = dates.endDate.getDay()
+        if(endDay == 0) endDay = 6;
+        else endDay--;
+
+        if(startDay > 4) dayDiff += startDay-4
+        tempStart = new Date(dates.startDate - (startDay*24*60*60*1000))
+        if(endDay > 4) dayDiff -= endDay-4
+        tempEnd = new Date(dates.endDate - (endDay*24*60*60*1000))
+
+        newDiff = (tempEnd-tempStart)/1000/60/60/24
+
+        if(newDiff/7 >= 1){
+            dayDiff -= Math.floor(newDiff/7)*2
+        }
+    }
+    
     let amtPerDay = total/dayDiff
     let amtPerWeek = 0
     let amtPerMonth = 0
