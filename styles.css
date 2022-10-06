@@ -1,0 +1,174 @@
+/* 
+Color Theme:
+    Red: #e63946
+    Green: #109648
+    Lighter Blue: #a8dadc
+    Purple: #4e4187
+    Blue: #3083dc
+    White: whitesmoke
+*/
+*{
+    box-sizing: border-box;
+}
+
+button{
+    cursor: pointer;
+}
+
+html, body{
+    margin: 0;
+    background-image: linear-gradient(45deg, #a8dadc, #3083dc);
+    background-repeat: no-repeat;
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Inter', sans-serif;
+}
+body{
+    text-align: center;
+}
+
+.container{
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+h1{
+    font-size: 3rem;
+    font-family: inherit;
+    font-weight: 900;
+    font-variant: small-caps;
+    margin: 10px;
+    color: #4e418c;
+    text-shadow: 0px 0px 2px #000;
+}
+
+.work-container{
+    text-align: left;
+    margin: 10px auto;
+    width: 75%;
+    border: 3px solid black;
+    border-radius: 5px;
+    padding: 10px;
+    visibility: hidden;
+}
+.dates{
+    display: flex;
+    justify-content: space-around;
+    width: 75%;
+    margin: 0 auto;
+}
+
+.main-btn{
+    border: none;
+    font-family: inherit;
+    font-weight: 400;
+    background: #109648;
+    color: whitesmoke;
+    /* text-shadow: 0px 0px 1px #264a29; */
+    padding: 0.75em;
+    border-radius: 1em;
+    text-align: center;
+    margin: 0.75em auto;
+    display: block;
+}
+
+.today-btn{
+    background-color: #EFCA08;
+    border: none;
+    border-radius: 50%;
+}
+
+input[type="date"]{
+    background: whitesmoke;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    padding: 0.25em;
+    border: none;
+    border-radius: 0.5em;
+    cursor: pointer;
+}
+
+.value-field{
+    margin: 0.5em auto;
+    max-width: 200px;
+    display: flex;
+    height: 2em;
+}
+
+.val-btn{
+    margin: 0 0 0 10px;
+    display: inline-block;
+    line-height: normal;
+    width: 1.75em;
+    height: 1.75em;
+    font-weight: bold;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 0.75rem;
+}
+.val-submit-btn{
+    background-color: #109648;
+    color: whitesmoke;
+}
+.val-delete-btn{
+    background-color: #e63946;
+    color: whitesmoke;
+    border: 1px solid #fff;
+}
+.val-p, .value-input{
+    padding: 0.25em;
+    font-size: 1rem;
+    border-radius: 0.5em;
+    border: none;
+    width: 60px;
+    background: white;
+    height: 1.5em;
+    text-align: left;
+    border: 1px solid #fff;
+}
+.val-p{
+    background-color: transparent;
+    color: #030f91;
+}
+form{
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+    align-items: center;
+}
+.final-field{
+    display: flex;
+    border: 1px solid black;
+    justify-content: space-around;
+    margin: 0.25em;
+}
+.reset-btn{
+    display: none;
+    margin: 10px 0;
+}
+.extras {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.spacer{
+    width: 0%;
+}
+
+.checkbox{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.hidden-btn{
+    display: none;
+}
+input[type="checkbox"]{
+    margin-bottom: 0px;
+}
+.checkbox p {
+    margin-top: 0px;
+    font-size: 0.75rem;
+}
